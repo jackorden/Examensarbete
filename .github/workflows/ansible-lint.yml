@@ -12,7 +12,7 @@ jobs:
         with:
           fetch-depth: 0 # needed for progressive mode to work
 
-      - name: Run ansible-lint
+      - name: Run ansible-lintt
         # replace `main` with any valid ref, or tags like `v6`
         uses: ansible/ansible-lint-action@main
         # optional:
