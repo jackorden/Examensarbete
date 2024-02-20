@@ -1,4 +1,4 @@
 - name: Update system
-      hosts: myhosts
+  hosts: myhosts
   roles:
     - system_update
