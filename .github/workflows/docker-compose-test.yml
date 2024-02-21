@@ -20,7 +20,10 @@ jobs:
       - name: Build and start Docker Compose services
         run: |
           docker compose -f postgres-docker/docker-compose.yml up -d
-          docker compose -f postgres-docker/docker-compose.yml ps        
+          docker compose -f postgres-docker/docker-compose.yml ps   
+
+      - name: Stop and remove Docker Compose services
+        run: docker compose -f postgres-docker/docker-compose.yml down
 
 # name: Docker compose tests
 # "on": [push, pull_request]
