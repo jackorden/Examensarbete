@@ -1,0 +1,60 @@
+name: Push into testing
+
+"on":
+  push:
+    branches: [testing]
+    paths: [postgres-docker/docker-compose.yml]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:25.0.3
+        ports:
+          - 5432:5432
+          - 8080:80
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and start Docker Compose services
+        run: |
+          docker compose -f postgres-docker/docker-compose.yml up -d
+          docker compose -f postgres-docker/docker-compose.yml ps
+
+      - name: Stop and remove Docker Compose services
+        run: docker compose -f postgres-docker/docker-compose.yml down
+
+# name: Docker compose tests
+# "on": [push, pull_request]
+
+# jobs:
+#   test-services:
+#     runs-on: ubuntu-latest
+#     services:
+#       docker:
+#         image: docker:23.0.3
+#         options: --privileged
+#         ports:
+#           - 5432:5432
+#           - 9999:80
+
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
+
+#       - name: Build and start Docker Compose services
+#         run: |
+#           docker compose -f postgres-docker/docker-compose.yml up -d
+#           docker compose -f postgres-docker/docker-compose.yml ps
+#         continue-on-error: true
+
+#       - name: Test service availability
+#         run: |
+#           # Check if the services are accessible
+#           curl -f http://localhost:8888
+#         continue-on-error: true
+
+#       - name: Stop and remove Docker Compose services
+#         run: docker compose -f postgres-docker/docker-compose.yml down

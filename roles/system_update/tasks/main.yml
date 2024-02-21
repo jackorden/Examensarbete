@@ -5,6 +5,5 @@
 - name: Upgrade all packages
   ansible.builtin.apt:
     upgrade: true
-
-- name: Reboot machine
-  ansible.builtin.reboot:
+# - name: Reboot machine
+#   ansible.builtin.reboot:
