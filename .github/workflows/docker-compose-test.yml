@@ -1,18 +1,16 @@
-  name: Push into Main
-  on:
-    push:
-      branches: [ main ]
+name: Push into testing | merging into main
+"on": [push, pull_request]
 
-  jobs:
-    test:
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v3
-  
-        - name: Tests
-          uses: cloudposse/github-action-docker-compose-test-run@main
-          with:
-            file: test/docker-compose.yml
-            service: app
-            command: test/unit-tests.sh
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Tests
+        uses: cloudposse/github-action-docker-compose-test-run@main
+        with:
+          file: test/docker-compose.yml
+          service: app
+          command: test/unit-tests.sh
