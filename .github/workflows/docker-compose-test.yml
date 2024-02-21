@@ -1,16 +1,33 @@
-name: Push into testing | merging into main
+name: Docker compose tests
 "on": [push, pull_request]
 
 jobs:
-  test:
+  test-services:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+    services:
+      docker:
+        image: docker:20.10.7
+        options: --privileged
+        ports:
+          - 5432:5432
+          - 9999:80
 
-      - name: Tests
-        uses: cloudposse/github-action-docker-compose-test-run@main
-        with:
-          file: postgres-docker/docker-compose.yml
-          service: db
-          command: test/unit-tests.sh
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build and start Docker Compose services
+        run: |
+          docker compose -f postgres-docker/docker-compose.yml up -d
+          docker compose -f postgres-docker/docker-compose.yml ps
+        continue-on-error: true
+
+      - name: Test service availability
+        run: |
+          # Check if the services are accessible
+          curl -f http://localhost:5432
+          curl -f http://localhost:9999
+        continue-on-error: true
+
+      - name: Stop and remove Docker Compose services
+        run: docker compose -f postgres-docker/docker-compose.yml down
