@@ -12,10 +12,15 @@ jobs:
       image: docker:25.0.3
       ports:
         - 5432:5432
-        - 9999:80      
+        - 8888:80      
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Build and start Docker Compose services
+        run: |
+          docker compose -f postgres-docker/docker-compose.yml up -d
+          docker compose -f postgres-docker/docker-compose.yml ps        
 
 # name: Docker compose tests
 # "on": [push, pull_request]
