@@ -12,7 +12,7 @@ jobs:
       image: docker:25.0.3
       ports:
         - 5432:5432
-        - 8888:80      
+        - 8080:80      
     steps:
       - name: Checkout
         uses: actions/checkout@v4
