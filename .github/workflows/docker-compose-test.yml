@@ -1,32 +1,51 @@
-name: Docker compose tests
-"on": [push, pull_request]
+name: Push into Main
+"on":
+  push:
+    branches: [ testing ]
 
 jobs:
-  test-services:
+  test:
     runs-on: ubuntu-latest
-    services:
-      docker:
-        image: docker:23.0.3
-        options: --privileged
-        ports:
-          - 5432:5432
-          - 9999:80
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: Build and start Docker Compose services
-        run: |
-          docker compose -f postgres-docker/docker-compose.yml up -d
-          docker compose -f postgres-docker/docker-compose.yml ps
-        continue-on-error: true
+      - name: Tests
+        uses: cloudposse/github-action-docker-compose-test-run@main
+        with:
+          file: test/docker-compose.yml
+          service: app
+          command: test/unit-tests.sh
 
-      - name: Test service availability
-        run: |
-          # Check if the services are accessible
-          curl -f http://localhost:9999
-        continue-on-error: true
+# name: Docker compose tests
+# "on": [push, pull_request]
 
-      - name: Stop and remove Docker Compose services
-        run: docker compose -f postgres-docker/docker-compose.yml down
+# jobs:
+#   test-services:
+#     runs-on: ubuntu-latest
+#     services:
+#       docker:
+#         image: docker:23.0.3
+#         options: --privileged
+#         ports:
+#           - 5432:5432
+#           - 9999:80
+
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
+
+#       - name: Build and start Docker Compose services
+#         run: |
+#           docker compose -f postgres-docker/docker-compose.yml up -d
+#           docker compose -f postgres-docker/docker-compose.yml ps
+#         continue-on-error: true
+
+#       - name: Test service availability
+#         run: |
+#           # Check if the services are accessible
+#           curl -f http://localhost:8888
+#         continue-on-error: true
+
+#       - name: Stop and remove Docker Compose services
+#         run: docker compose -f postgres-docker/docker-compose.yml down
