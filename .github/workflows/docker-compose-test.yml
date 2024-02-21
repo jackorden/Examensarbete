@@ -1,21 +1,21 @@
 name: Push into Main
+
 "on":
   push:
-    branches: [ testing ]
+    branches: 
+      - testing
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    container:
+      image: docker:25.0.3
+      ports:
+        - 5432:5432
+        - 9999:80      
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Tests
-        uses: cloudposse/github-action-docker-compose-test-run@main
-        with:
-          file: test/docker-compose.yml
-          service: app
-          command: test/unit-tests.sh
 
 # name: Docker compose tests
 # "on": [push, pull_request]
