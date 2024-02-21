@@ -11,6 +11,6 @@ jobs:
       - name: Tests
         uses: cloudposse/github-action-docker-compose-test-run@main
         with:
-          file: test/docker-compose.yml
+          file: postgres-docker/docker-compose.yml
           service: app
           command: test/unit-tests.sh
