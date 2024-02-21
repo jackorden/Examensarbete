@@ -2,3 +2,4 @@
   hosts: myhosts
   roles:
     - system_update
+    - docker
