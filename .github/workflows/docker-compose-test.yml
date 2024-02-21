@@ -1,9 +1,9 @@
-name: Push into Main
+name: Push into testing
 
 "on":
   push:
-    branches:
-      - testing
+    branches: [testing]
+    paths: [postgres-docker/docker-compose.yml]
 
 jobs:
   test:
