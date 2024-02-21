@@ -23,6 +23,6 @@ services:
     volumes:
       - pgadmin-data:/var/lib/pgadmin
 
-volumbajses:
+volumes:
   local_pgdata:
   pgadmin-data:
