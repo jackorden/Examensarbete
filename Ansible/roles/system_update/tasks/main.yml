@@ -1,0 +1,9 @@
+- name: Update package cache
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Upgrade all packages
+  ansible.builtin.apt:
+    upgrade: true
+# - name: Reboot machine
+#   ansible.builtin.reboot:
