@@ -5,5 +5,10 @@
 - name: Upgrade all packages
   ansible.builtin.apt:
     upgrade: true
-# - name: Reboot machine
-#   ansible.builtin.reboot:
+
+- name: Install qemu-guest-agent
+  ansible.builtin.apt:
+    name: qemu-guest-agent
+
+- name: Reboot machine
+  ansible.builtin.reboot:
