@@ -1,5 +1,9 @@
+# Based on GitHub's own example of GitHub Actions.
 name: ansible-lint
-"on": [push, pull_request]
+
+"on":
+  push:
+    branches: [testing]
 
 jobs:
   build:
