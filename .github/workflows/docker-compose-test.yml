@@ -25,7 +25,7 @@ jobs:
 
       - name: Test service availability
         run: |
-          wget --spider http://localhost:8080
+          wget --spider http://localhost:8085
         continue-on-error: true
 
       - name: Stop and remove Docker Compose services
