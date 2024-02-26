@@ -26,7 +26,6 @@ jobs:
       - name: Test service availability
         run: |
           wget --spider http://localhost:8085
-        continue-on-error: true
 
       - name: Stop and remove Docker Compose services
         run: docker compose -f postgres-docker/docker-compose.yml down
