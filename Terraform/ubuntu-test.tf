@@ -1,4 +1,4 @@
-resource "proxmox_virtual_environment_vm" "tango-test1" {
+resource "proxmox_virtual_environment_vm" "tango-test" {
     
     for_each = {
         for index,vm in var.vm_config:
