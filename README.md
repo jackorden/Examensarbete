@@ -1,4 +1,4 @@
-# Tango AB - Test environment
+# Tango AB - Testing environment
 
 ## Configuration of Proxmox
 
@@ -12,53 +12,55 @@ API-token used by Terraform in order to provision machines on the Proxmox node "
 ### Storage
 
 local: Here is where ISO images, CT containers and backups are stored.
-local-lvm: Here is where the VM disks and corresponding cloudinit and CT volumes are stored. Also templates used by the VMs are stored here.
+local-lvm: Here is where the VM disks and corresponding cloudinit and CT volumes are stored. The templates used by the VMs are also stored here.
+
 ![storage](images/image5.png)
 
-### Creating a VM template
+### VM template
 
-In order to automate the creation of virtual machines they need to be cloned from a template. The image used to create the template, which the test VMs are based on, is a cloud image.  
+In order to automate the creation of virtual machines they are cloned from a template. The image used to create the template, which the test VMs are based on, is a cloud image.  
 
-On the Proxmox node "pve" run the shell command "wget" + the link of the cloud image.
+"ubuntu-22.04-minimal-cloudimg-amd64.img" is the cloud image used to create the template "ubuntu-2204-template1" in this testing environment.
 
-For example, the cloud image used to create the template in this test environment:
+On the Proxmox node "pve" the cloud image is installed using the shell command "wget":
 
 ```bash
 wget https://cloudimages.ubuntu.com/minimal/releases/jammy/release/ubuntu-22.04-minimal-cloudimg-amd64.img" 
 ```
 
-#### These are the non-default settings used to create the  VM template:
+#### These are the non-default settings used to create the  VM template
 
 - Name: ubuntu-2204-template1
 - VMID: 1000
 - Do not use any media
 - Qemu Agent: Enabled
-- Delete scsi0 disk.
+- Delete scsi0 disk
 - Add CloudInit Drive: local-lvm
 - CloudInit settings:
 ![cloudinit](images/image1.png)
 
 #### Shell
-Afterwards, some shell commands needs to be executed on the Proxmox node "pve". Replace [vmid], [old_image_name] and [image_name] with corresponding values.  
 
-To be able to see the VM later through the console in Proxmox, run this shell command:  
+Afterwards, some shell commands are executed on the Proxmox node "pve". If a new testing template is needed, replace [vmid], [old_image_name], [image_name] and [size] with corresponding values.  
+
+To be able to see the VM later through the console in Proxmox:  
 
 ```bash
 qm set [vmid] --serial0 socket --vga serial0 
 ```
 
-The image needs to be renamed so it has the .qcow2 as the extension, otherwise Proxmox won't be able to use it:
+The image is renamed so it has the .qcow2 as the extension, otherwise Proxmox won't be able to use it:
 
 ```bash
 mv [old_image_name] [image_name].qcow2" 
 ```
 
-Next, resize image before using it in Proxmox, this template size will be 32GB: 
+Next, the image is resized before using it in Proxmox - this template size will be 32GB:
 
 ```bash
-qemu-img resize [image_name] 32G 
+qemu-img resize [image_name] [size] 
 ``` 
-Before importing the disk to our storage "local-lvm" the "qemu-guest-agent" is installed directly on the image, which is a daemon that exchanges information between the host and guest:
+Before the disk is imported to the storage "local-lvm", the "qemu-guest-agent" is installed directly on the image, which is a daemon that exchanges information between the host and guest:
 
 ```bash
 sudo apt install guestfs-tools
@@ -67,41 +69,47 @@ qm importdisk [vmid] [image_name] local-lvm
 ```
 
 #### GUI
-Now we move from the shell to the GUI, and under the template, add the disk that just got imported: 
+Now we move from the shell to the GUI, and under the template, the disk that just got imported is added: 
 ![disk](images/image3.png)
 
 ##### Thereafter, these non-default settings are changed
-- Change boot order:
+- The scsi0 is enabled and the boot order is changed to this:
 ![bootorder](images/image2.png)
 
 - Start at boot: Yes
 
-**WARNING:** Make sure all the desired settings are set, since they can't be changed after the template is created. Finally, right click the VM "ubuntu-2204-template1" and convert to template.  
- 
-If you're creating another template based on the same image you start from this step:
+The template is finalized after right clicking the VM "ubuntu-2204-template1" and clicking "Convert to template".
+
+**NOTE:** After converting the VM to a template, changes can no longer be made, make sure all the desired settings are set before doing so. If the testing template needs to be updated, start over from the beginning. If a new testing template is to be created using the same cloud image, you start from this step:
 
 ```bash
 qm importdisk [vmid] [image_name] local-lvm
 ```
 
-### Cloud-init
-The VMs created through one of the 
+### Terraform
 
- 
-Configuration of Terraform 
-Installation of Terraform 
- 
-### Terraform 
-Provider API for proxmox 
-Create an API-token in Proxmox 
-f337998e-a057-44f1-bf6f-32bcd68031e9 
- 
-### Ansible 
+Terraform is the tool used to provision the VMs inside this testing environment. In order to use it a provider API and an API-token is needed:
+
+- API-token was created in Proxmox and stored in the file "credentials.tf". This is used to connect to Proxmox through Terraform.
+
+- Provider API: "bpg/proxmox"
+ Version: ">= 0.46.6"
+https://registry.terraform.io/providers/bpg/proxmox/latest
+
+
+[Link to Code File](Terraform/provider.tf)
+
+#### Cloud-init
+
+The testing template "ubuntu-2204-template1" uses Cloud-init, which means that the settings which were set applies to every VM created using said template. However, these settings can be overridden if we specify these Cloud-init settings inside the .tf file that is applied.
+
+### Ansible
+
 #### Installation and configuration of Ansible
- 
+
 This command is used  
- 
-ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no' 
+
+ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'
 
 
 ### Docker 
@@ -118,8 +126,10 @@ Ansible-lint
 .yml 
 Testing 
 Changes in docker-compose triggers a workflow that spins up a docker container and tests the code 
- 
-### Deployment 
+
+### Deployment
+
+Deploying the whole testing environment with a oneliner.
 
 ```bash
 cd Terraform/ && terraform apply -auto-approve && cd .. && ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'
