@@ -100,7 +100,10 @@ Terraform is the tool used to provision the VMs inside this testing environment.
 
 ![api-token](images/image4.png)
 
-- Provider API: "bpg/proxmox", Version: ">= 0.46.6" https://registry.terraform.io/providers/bpg/proxmox/latest
+- Provider API: 
+  - "bpg/proxmox" 
+  - Version: ">= 0.46.6" 
+  - https://registry.terraform.io/providers/bpg/proxmox/latest
 
 
 [Link to Code File](Terraform)
