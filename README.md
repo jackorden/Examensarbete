@@ -2,17 +2,17 @@
 
 ## Configuration of Proxmox
 
-Version: 8.1.3
-Hostname: pve
-Username: root
-IP Address: 10.6.67.221  
-API-token used by Terraform in order to provision machines on the Proxmox node "pve":
-![api-token](images/image4.png)
+- Version: 8.1.3
+- Hostname: pve
+- Username: root
+- IP Address: 10.6.67.221/24
+- Gateway: 10.6.67.1/24
+- Port: 8006
 
 ### Storage
 
-local: Here is where ISO images, CT containers and backups are stored.
-local-lvm: Here is where the VM disks and corresponding cloudinit and CT volumes are stored. The templates used by the VMs are also stored here.
+- local: Here is where ISO images, CT containers and backups are stored.
+- local-lvm: Here is where the VM disks and corresponding cloudinit and CT volumes are stored. The templates used by the VMs are also stored here.
 
 ![storage](images/image5.png)
 
@@ -22,7 +22,7 @@ In order to automate the creation of virtual machines they are cloned from a tem
 
 "ubuntu-22.04-minimal-cloudimg-amd64.img" is the cloud image used to create the template "ubuntu-2204-template1" in this testing environment.
 
-On the Proxmox node "pve" the cloud image is installed using the shell command "wget":
+On the Proxmox node "pve" the cloud image is installed using the shell command `wget`
 
 ```bash
 wget https://cloudimages.ubuntu.com/minimal/releases/jammy/release/ubuntu-22.04-minimal-cloudimg-amd64.img" 
@@ -36,14 +36,15 @@ wget https://cloudimages.ubuntu.com/minimal/releases/jammy/release/ubuntu-22.04-
 - Qemu Agent: Enabled
 - Delete scsi0 disk
 - Add CloudInit Drive: local-lvm
-- CloudInit settings:
+- CloudInit settings
+  
 ![cloudinit](images/image1.png)
 
 #### Shell
 
 Afterwards, some shell commands are executed on the Proxmox node "pve". If a new testing template is needed, replace [vmid], [old_image_name], [image_name] and [size] with corresponding values.  
 
-To be able to see the VM later through the console in Proxmox:  
+To be able to see the VM later through the console in Proxmox and configure it:  
 
 ```bash
 qm set [vmid] --serial0 socket --vga serial0 
@@ -55,11 +56,14 @@ The image is renamed so it has the .qcow2 as the extension, otherwise Proxmox wo
 mv [old_image_name] [image_name].qcow2" 
 ```
 
-Next, the image is resized before using it in Proxmox - this template size will be 32GB:
+Next, the image is resized before using it in Proxmox:
 
 ```bash
 qemu-img resize [image_name] [size] 
 ``` 
+
+The template size in this environment is 32GB.
+
 Before the disk is imported to the storage "local-lvm", the "qemu-guest-agent" is installed directly on the image, which is a daemon that exchanges information between the host and guest:
 
 ```bash
@@ -69,7 +73,8 @@ qm importdisk [vmid] [image_name] local-lvm
 ```
 
 #### GUI
-Now we move from the shell to the GUI, and under the template, the disk that just got imported is added: 
+Now we move from the shell to the GUI, and under the template, the disk that just got imported is added:
+
 ![disk](images/image3.png)
 
 ##### Thereafter, these non-default settings are changed
@@ -88,20 +93,23 @@ qm importdisk [vmid] [image_name] local-lvm
 
 ### Terraform
 
-Terraform is the tool used to provision the VMs inside this testing environment. In order to use it a provider API and an API-token is needed:
+Terraform is the tool used to provision the VMs inside this testing environment. In order to use it an endpoint, an API-token and a provider API are needed:
 
-- API-token was created in Proxmox and stored in the file "credentials.tf". This is used to connect to Proxmox through Terraform.
+- Endpoint: https://10.6.67.221:8006
+- API-token was created in Proxmox and stored in the file "credentials.tf". This is used to connect to the Proxmox node "pve" through Terraform.
+![api-token](images/image4.png)
 
 - Provider API: "bpg/proxmox"
- Version: ">= 0.46.6"
+- Version: ">= 0.46.6"
+
 https://registry.terraform.io/providers/bpg/proxmox/latest
 
 
-[Link to Code File](Terraform/provider.tf)
+[Link to Code File](Terraform)
 
 #### Cloud-init
 
-The testing template "ubuntu-2204-template1" uses Cloud-init, which means that the settings which were set applies to every VM created using said template. However, these settings can be overridden if we specify these Cloud-init settings inside the .tf file that is applied.
+The testing template "ubuntu-2204-template1" uses Cloud-init, which means that the settings which were set applies to every VM created using said template. However, these settings can be overridden if we specify these Cloud-init settings inside the .tf file that is applied through `Terraform apply`
 
 ### Ansible
 
@@ -109,7 +117,9 @@ The testing template "ubuntu-2204-template1" uses Cloud-init, which means that t
 
 This command is used  
 
+```bash
 ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'
+```
 
 
 ### Docker 
