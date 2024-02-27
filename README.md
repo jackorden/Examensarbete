@@ -97,6 +97,7 @@ Terraform is the tool used to provision the VMs inside this testing environment.
 
 - Endpoint: https://10.6.67.221:8006
 - API-token was created in Proxmox and stored in the file "credentials.tf". This is used to connect to the Proxmox node "pve" through Terraform.
+
 ![api-token](images/image4.png)
 
 - Provider API: "bpg/proxmox"
