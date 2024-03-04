@@ -163,11 +163,11 @@ This environment is split into two branches: "main" and "testing". The main bran
 
 #### Configuration of GitHub Actions 
 
-GitHub Actions is a CI/CD tool. There are two workflows in this environment: "ansible-lint" and "docker-compose-test".
+GitHub Actions is a CI/CD tool. There are two workflows in this environment: "ansible-lint" and "docker-compose-test". A workflow spins up a cloud container on a runner provided by GitHub and tests changes to code on said container.
 
 The ansible-lint checks the syntax on commits on all .yml files and automatically checks and passes none .yml files.
 
-The "docker-compose-test" checks changes made to the "docker-compose.yml" and spins up a cloud container on a runner provided by GitHub and test those changes on said container. 
+The "docker-compose-test" checks changes made to the "docker-compose.yml".
 
 
 ### Deployment
