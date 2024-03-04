@@ -157,17 +157,18 @@ The first playbook that gets executed, after the VMs are provisioned by Terrafor
 
 Ansible installs a docker container on the host/s specified in the "inventory.ini" file using "docker compose". The "docker compose" file sets up a PostgreSQL database on port 5432 with pgAdmin on port 8080. The volumes created by the "docker compose" are destroyed when the VM is destroyed.
  
-### Github 
+### GitHub 
 
-This environment is split into two branches: "main" and "testing". The main branch is representing a production branch and the testing branch is representing a testing branch, where changes to the code are initially commited and tested. When merging the two, the commited code to testing branch should pass all checks and the pull request manually  
-#### Configuration of Github Actions 
-Github Actions CI/CD 
-Runners 
-Workflows 
-Ansible-lint 
-.yml 
-Testing 
-Changes in docker-compose triggers a workflow that spins up a docker container and tests the code 
+This environment is split into two branches: "main" and "testing". The main branch is representing a production branch and the testing branch is representing a testing branch, where changes to the code are initially commited and tested. Before merging the two, the code that is commited to the testing branch should pass all checks, afterwards the pull request needs to be manually approved.
+
+#### Configuration of GitHub Actions 
+
+GitHub Actions is a CI/CD tool. There are two workflows in this environment: "ansible-lint" and "docker-compose-test".
+
+The ansible-lint checks the syntax on commits on all .yml files and automatically checks and passes none .yml files.
+
+The "docker-compose-test" checks changes made to the "docker-compose.yml" and spins up a cloud container on a runner provided by GitHub and test those changes on said container. 
+
 
 ### Deployment
 
