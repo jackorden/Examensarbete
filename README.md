@@ -105,8 +105,17 @@ Terraform is the tool used to provision the VMs inside this testing environment.
   - Version: ">= 0.46.6" 
   - https://registry.terraform.io/providers/bpg/proxmox/latest
 
-
 [Link to Code File](Terraform)
+
+#### 
+
+In order to provision resources on the endpoint, a client with Terraform is needed:
+
+```bash
+terraform --version
+Terraform v1.7.4
+on linux_amd64
+```
 
 #### Cloud-init
 
@@ -114,13 +123,33 @@ The testing template "ubuntu-2204-template1" uses Cloud-init, which means that t
 
 ### Ansible
 
-#### Installation and configuration of Ansible
+In order to configure multiple VMs, a client with Ansible is needed:
 
-This command is used  
+```bash
+ansible --version
+ansible [core 2.16.4]
+  python version = 3.10.12
+  jinja version = 3.0.3
+```
+
+
+#### Playbook
 
 ```bash
 ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'
 ```
+The playbook is the "playbook.yml" file.
+
+The "inventory.ini" file stores variables, such as hostnames, root username and password.
+
+Ansible Vault is set up, which encrypts files and variables. In this environment the "passwd.yml" file contains the sudo password for the client running Ansible and is encrypted using the vault password.
+
+The argument `--extra-vars "@passwd.yml"` pulls variables from "passwd.yml", in this case the sudo password.
+
+To be able to access the variables, the argument `--ask-vault-pass` is parsed and asks for the vault password, which unlocks the "passwd.yml" file. 
+
+The first playbook that gets executed after the VMs are provisioned by Terraform needs to have the argument `--ssh-common-args='-o StrictHostKeyChecking=no'`. Since the fresh VMs have new pairs of SSH-keys they would otherwise have to be manually approved. When running a playbook after the initial configuration, the argument can be ommited, since the keys are now stored in the client's "known_hosts" file.
+
 
 
 ### Docker 
