@@ -73,6 +73,7 @@ qm importdisk [vmid] [image_name] local-lvm
 ```
 
 #### GUI
+
 Now we move from the shell to the GUI, and under the template, the disk that just got imported is added:
 
 ![disk](images/image3.png)
@@ -107,7 +108,7 @@ Terraform is the tool used to provision the VMs inside this testing environment.
 
 [Link to Code File](Terraform)
 
-#### 
+#### Version
 
 In order to provision resources on the endpoint, a client with Terraform is needed:
 
@@ -119,11 +120,13 @@ on linux_amd64
 
 #### Cloud-init
 
-The testing template "ubuntu-2204-template1" uses Cloud-init, which means that the settings which were set applies to every VM created using said template. However, these settings can be overridden if we specify these Cloud-init settings inside the .tf file that is applied through `Terraform apply`
+The testing template "ubuntu-2204-template1" uses Cloud-init, which means that the settings which were set applies to every VM created using said template. However, these settings can be overridden if we specify these Cloud-init settings inside the .tf file that is applied through `terraform apply`.
 
 ### Ansible
 
 In order to configure multiple VMs, a client with Ansible is needed:
+
+#### Version
 
 ```bash
 ansible --version
@@ -132,13 +135,13 @@ ansible [core 2.16.4]
   jinja version = 3.0.3
 ```
 
-
 #### Playbook
 
 ```bash
 ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'
 ```
-The playbook is the "playbook.yml" file.
+
+The playbook is the "playbook.yml" file and it contains two roles: "system_update" and "docker". Using roles makes the code more modular and easier to read. Additional roles or plays to the playbook can easily be added.
 
 The "inventory.ini" file stores variables, such as hostnames, root username and password.
 
@@ -148,16 +151,15 @@ The argument `--extra-vars "@passwd.yml"` pulls variables from "passwd.yml", in 
 
 To be able to access the variables, the argument `--ask-vault-pass` is parsed and asks for the vault password, which unlocks the "passwd.yml" file. 
 
-The first playbook that gets executed after the VMs are provisioned by Terraform needs to have the argument `--ssh-common-args='-o StrictHostKeyChecking=no'`. Since the fresh VMs have new pairs of SSH-keys they would otherwise have to be manually approved. When running a playbook after the initial configuration, the argument can be ommited, since the keys are now stored in the client's "known_hosts" file.
-
-
+The first playbook that gets executed, after the VMs are provisioned by Terraform, needs to have the argument `--ssh-common-args='-o StrictHostKeyChecking=no'` since the fresh VMs have new pairs of SSH-keys which would otherwise have to be manually approved. When running a playbook after the initial configuration, the argument can be ommited, since the keys are now stored in the client's "known_hosts" file. If the VMs are destroyed, their keys also needs to be removed from "known_hosts" before being deployed again.
 
 ### Docker 
-Docker 
-Docker Compose 
+
+Ansible installs a docker container on the host/s specified in the "inventory.ini" file using "docker compose". The "docker compose" file sets up a PostgreSQL database on port 5432 with pgAdmin on port 8080. The volumes created by the "docker compose" are destroyed when the VM is destroyed.
  
-### Configuration of Github 
- 
+### Github 
+
+This environment is split into two branches: "main" and "testing". The main branch is representing a production branch and the testing branch is representing a testing branch, where changes to the code are initially commited and tested. When merging the two, the commited code to testing branch should pass all checks and the pull request manually  
 #### Configuration of Github Actions 
 Github Actions CI/CD 
 Runners 
@@ -169,10 +171,15 @@ Changes in docker-compose triggers a workflow that spins up a docker container a
 
 ### Deployment
 
-Deploying the whole testing environment with a oneliner.
+Deploying the VMs with a oneliner.
 
 ```bash
 cd Terraform/ && terraform apply -auto-approve && cd .. && ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'
 ```
 
+Destroying the VMs
+
+```bash
+cd Terraform/ && terraform apply -destroy -auto-approve
+```
 
