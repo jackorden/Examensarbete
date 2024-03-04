@@ -169,7 +169,6 @@ The ansible-lint checks the syntax on commits on all .yml files and automaticall
 
 The "docker-compose-test" checks changes made to the "docker-compose.yml".
 
-
 ### Deployment
 
 Deploying the VMs with a oneliner.
