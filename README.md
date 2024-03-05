@@ -168,10 +168,6 @@ GitHub Actions is a CI/CD tool. There are two workflows in this environment: "an
 The ansible-lint checks the syntax on commits on all .yml files and automatically checks and passes none .yml files.
 
 The "docker-compose-test" checks changes made to the "docker-compose.yml".
-<<<<<<< HEAD
-=======
-
->>>>>>> 02dfe2e5d3c920406fe39af8e8e37e1945316b31
 
 ### Deployment
 
@@ -189,4 +185,3 @@ cd .. && ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.ym
 ```bash
 cd Terraform/ && terraform apply -destroy -auto-approve
 ```
-
