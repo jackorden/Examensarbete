@@ -3,7 +3,7 @@ name: Tflint
 "on":
   push:
     branches: [testing]
-    # paths: ["Terraform/**/*.tf"]
+    paths: ["Terraform/**/*.tf"]
 
 jobs:
     tflint:
@@ -17,7 +17,12 @@ jobs:
         name: Setup TFLint
         with:
           tflint_version: v0.50.3
-  
+      
+      - name: Switch to Terraform directory
+        run: |
+            pwd
+            cd Terraform
+          
       - name: Show version
         run: tflint --version
   
@@ -36,4 +41,4 @@ jobs:
       
       - run: echo ${{ steps.tflint.outputs.stdout }}
       - run: echo ${{ steps.tflint.outputs.stderr }}
-      - run: echo ${{ steps.tflint.outputs.exitcode }}        
+      - run: echo ${{ steps.tflint.outputs.exitcode }}
