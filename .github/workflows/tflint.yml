@@ -37,7 +37,9 @@ jobs:
           tflint_wrapper: true
       
       - id: tflint
-        run: tflint -f compact
+        run: |
+            pwd
+            tflint -f compact
       
       - run: echo ${{ steps.tflint.outputs.stdout }}
       - run: echo ${{ steps.tflint.outputs.stderr }}
