@@ -167,7 +167,7 @@ GitHub Actions is a CI/CD tool. There are two workflows in this environment: "an
 
 #### Workflows
 
-The "ansible-lint.yml" checks the syntax on commits on all files with the file extension ".yml" inside the /Ansible folder.
+The "ansible-lint.yml" checks the syntax on commits on all files with the file extension ".yml" inside the ./Ansible folder.
 
 The "docker-compose-test" checks changes made to the "docker-compose.yml".
 
