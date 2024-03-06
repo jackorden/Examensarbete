@@ -40,7 +40,3 @@
     chdir: /home/jack/
   register: my_output
   changed_when: my_output.rc != 0
-
-testing lint
-
-testing
