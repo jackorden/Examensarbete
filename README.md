@@ -169,18 +169,19 @@ The ansible-lint checks the syntax on commits on all .yml files and automaticall
 
 The "docker-compose-test" checks changes made to the "docker-compose.yml".
 
-
 ### Deployment
 
-Deploying the VMs with a oneliner.
+#### Deploying the VMs
+
+**NOTE:** Running the playbook immediately after using `terraform apply` can sometimes cause the playbook to fail at upgrading the VMs.
 
 ```bash
-cd Terraform/ && terraform apply -auto-approve && cd .. && ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'
+cd Terraform/ && terraform apply -auto-approve
+cd .. && ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'
 ```
 
-Destroying the VMs
+#### Destroying the VMs
 
 ```bash
 cd Terraform/ && terraform apply -destroy -auto-approve
 ```
-
