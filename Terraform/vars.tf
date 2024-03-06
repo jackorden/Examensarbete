@@ -34,3 +34,7 @@ variable "vm_config" {
     }
     ]
 }
+
+test
+
+ 
