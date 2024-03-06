@@ -19,7 +19,3 @@ provider "proxmox" {
 # Uses http instead of https
     insecure = true
 }
-
-blablablabla
-sdfksdfadasd
-asdasd
