@@ -1,0 +1,26 @@
+- name: Remove existing machine-id
+  ansible.builtin.command: "sudo rm /etc/machine-id"
+  register: output
+  changed_when: output != 0
+  # Om machine-id redan är borttaget, ignorera felmeddelandet.
+  ignore_errors: true
+
+- name: Create new unique machine-id
+  ansible.builtin.command: "sudo systemd-machine-id-setup"
+  register: output
+  changed_when: output != 0
+
+- name: Reboot machine
+  ansible.builtin.reboot:
+
+- name: Update package cache
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Upgrade all packages
+  ansible.builtin.apt:
+    upgrade: true
+# If qemu-guest-agent isn't installed.
+- name: Install qemu-guest-agent
+  ansible.builtin.apt:
+    name: qemu-guest-agent
