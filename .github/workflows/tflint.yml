@@ -3,7 +3,8 @@ name: Tflint
 "on":
   push:
     branches: [testing]
-    paths: ["Terraform/**/*.tf"]
+    paths: ["Examensarbete/"]
+    # paths: ["Terraform/**/*.tf"]
 
 jobs:
     tflint:
