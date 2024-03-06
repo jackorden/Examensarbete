@@ -2,7 +2,7 @@ terraform {
 
     required_version = ">= 0.14"
 
-    reqsded_providers {
+    required_providers {
         proxmox = {
             source = "bpg/proxmox"
             version = ">= 0.46.6"
@@ -20,5 +20,4 @@ provider "proxmox" {
     insecure = true
 }
 
-
- sdfwer
+blablabla
