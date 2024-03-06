@@ -12,19 +12,12 @@ jobs:
       steps:
       - uses: actions/checkout@v4
         name: Checkout source code
-        
-  
+
       - uses: terraform-linters/setup-tflint@v4
         name: Setup TFLint
         with:
           tflint_version: v0.50.3
  
-      
-      - name: Print working directory
-        working-directory: ./Terraform
-        run: |
-            pwd
-          
       - name: Show version
         run: tflint --version
   
@@ -41,9 +34,7 @@ jobs:
       
       - id: tflint
         working-directory: ./Terraform
-        run: |
-            pwd
-            tflint -f compact
+        run: tflint -f compact
       
       - run: echo ${{ steps.tflint.outputs.stdout }}
       - run: echo ${{ steps.tflint.outputs.stderr }}
