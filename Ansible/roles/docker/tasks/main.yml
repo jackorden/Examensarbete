@@ -30,7 +30,7 @@
 
 - name: Copy docker-compose.yml
   ansible.builtin.copy:
-    src: postgres-docker/docker-compose.yml
+    src: ../postgres-docker/docker-compose.yml
     dest: /home/jack/docker-compose.yml
     mode: "0644"
 

@@ -163,21 +163,29 @@ This environment is split into two branches: "main" and "testing". The main bran
 
 #### Configuration of GitHub Actions 
 
-GitHub Actions is a CI/CD tool. There are two workflows in this environment: "ansible-lint" and "docker-compose-test". A workflow spins up a cloud container on a runner provided by GitHub and tests changes to code on said container.
+GitHub Actions is a CI/CD tool. There are two workflows in this environment: "ansible-lint" and "docker-compose-test". A workflow spins up a cloud container on a runner provided by GitHub and tests changes to code on said container. 
 
-The ansible-lint checks the syntax on commits on all .yml files and automatically checks and passes none .yml files.
+#### Workflows
+
+The "ansible-lint.yml" checks the syntax on commits on all files with the file extension ".yml" inside the /Ansible folder.
 
 The "docker-compose-test" checks changes made to the "docker-compose.yml".
+
+The "tflint.yml" checks syntax on all files with file extension ".tf" inside the ./Terraform directory.
+
+#### Cost
+
+Every commit which is affected by either one of these workflows takes around 30-60 seconds for a runner to test. Every workflow that runs under 60 seconds gets billed as 1 minute. With the GitHub Team subscription the team gets 5000 CI/CD minutes/per month in total.
 
 ### Deployment
 
 #### Deploying the VMs
 
-**NOTE:** Running the playbook immediately after using `terraform apply` can sometimes cause the playbook to fail at upgrading the VMs.
+**NOTE:** Running the playbook immediately after using `terraform apply` can sometimes cause the playbook to fail at upgrading the VMs. The initial command is run from /Examensarbete
 
 ```bash
 cd Terraform/ && terraform apply -auto-approve
-cd .. && ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'
+cd ../Ansible/ && ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'
 ```
 
 #### Destroying the VMs

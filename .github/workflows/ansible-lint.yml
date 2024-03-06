@@ -4,6 +4,7 @@ name: ansible-lint
 "on":
   push:
     branches: [testing]
+    paths: ["Ansible/**/*.yml"]
 
 jobs:
   build:
