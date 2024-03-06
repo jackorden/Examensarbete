@@ -1,0 +1,9 @@
+- name: Update system
+  hosts: myhosts
+  roles:
+    - system_update
+
+- name: Install docker and create a container with PostgreSQL and pgAdmin.
+  hosts: docker
+  roles:
+    - docker
