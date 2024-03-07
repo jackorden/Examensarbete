@@ -94,7 +94,7 @@ qm importdisk [vmid] [image_name] local-lvm
 
 ### Terraform
 
-Terraform is the tool used to provision the VMs inside this testing environment. In order to use it an endpoint, an API-token and a provider API are needed:
+Terraform is the tool used to provision the VMs inside this testing environment. In order to use it, an endpoint, an API-token and a provider API are needed:
 
 - Endpoint: https://10.6.67.221:8006
 - API-token was created in Proxmox and stored in the file "credentials.tf". This is used to connect to the Proxmox node "pve" through Terraform.
@@ -163,11 +163,11 @@ This environment is split into two branches: "main" and "testing". The main bran
 
 #### Configuration of GitHub Actions 
 
-GitHub Actions is a CI/CD tool. There are two workflows in this environment: "ansible-lint" and "docker-compose-test". A workflow spins up a cloud container on a runner provided by GitHub and tests changes to code on said container. 
+GitHub Actions is a CI/CD tool. There are several workflows in this environment. A workflow spins up a cloud container on a runner provided by GitHub and tests changes to code on said container.
 
 #### Workflows
 
-The "ansible-lint.yml" checks the syntax on commits on all files with the file extension ".yml" inside the /Ansible folder.
+The "ansible-lint.yml" checks the syntax on commits on all files with the file extension ".yml" inside the ./Ansible folder.
 
 The "docker-compose-test" checks changes made to the "docker-compose.yml".
 

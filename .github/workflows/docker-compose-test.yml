@@ -1,4 +1,4 @@
-name: Push into testing
+name: Push docker compose into testing
 
 "on":
   push:
