@@ -209,23 +209,23 @@ The argument `--extra-vars "@passwd.yml"` pulls variables from "passwd.yml", in 
 
 To be able to access the variables, the argument `--ask-vault-pass` is parsed and asks for the vault password, which unlocks the "passwd.yml" file. 
 
-The first playbook that gets executed, after the VMs are provisioned by Terraform, needs to have the argument `--ssh-common-args='-o StrictHostKeyChecking=no'` since the fresh VMs have new pairs of SSH-keys which would otherwise have to be manually approved. When running a playbook after the initial configuration, the argument can be ommited, since the keys are now stored in the client's "known_hosts" file. If the VMs are destroyed, their keys also needs to be removed from "known_hosts" before being deployed again.
+The first playbook that gets executed, after the VMs are provisioned by Terraform, needs to have the argument `--ssh-common-args='-o StrictHostKeyChecking=no'` since the fresh VMs have new pairs of SSH-keys which would otherwise have to be manually approved by the client running Ansible. When running a playbook after the initial configuration, the argument can be ommited, since the keys are now stored in the client's "known_hosts" file. If the VMs are destroyed, their keys also need to be removed from "known_hosts" before being deployed again.
 
 [Link to Code](Ansible)
 
 ### Docker
 
-Ansible installs a docker container on the host/s specified in the "inventory.ini" file using "docker compose". The "docker compose" file sets up a PostgreSQL database on port 5432 with pgAdmin on port 8080. The volumes created by the "docker compose" are destroyed when the VM is destroyed.
+Ansible installs a docker container on the host/s specified in the "inventory.ini" file using "docker compose". The "docker compose" file sets up a PostgreSQL database on port 5432 with pgAdmin on port 8080. The volumes created by the "docker compose" are destroyed when the VM running "docker compose" is destroyed.
 
 [Link to Code](postgres-docker)
 
 ### GitHub
 
-This environment is split into two branches: "main" and "testing". The main branch is representing a production branch and the testing branch is representing a testing branch, where changes to the code are initially commited and tested. Before merging the two, the code that is commited to the testing branch should pass all checks, afterwards the pull request needs to be manually approved.
+This environment is split into two branches: "main" and "testing". The main branch is representing a production branch and the testing branch is where changes to the code are initially commited and tested. Before merging the two, the code that is commited to the testing branch should pass all checks, afterwards the pull request needs to be manually approved.
 
 #### Configuration of GitHub Actions 
 
-GitHub Actions is a CI/CD tool. There are several workflows in this environment. A workflow tests code on a runner provided by GitHub, also if specified, the runner can spin up a container to test changes to code. All workflows used in this testing environment can be found on the GitHub Marketplace, except the "docker-compose-test".
+GitHub Actions is a CI/CD tool. There are several workflows in this environment. A workflow tests code on a runner provided by GitHub, also if specified, the runner can spin up a container to test changes made to code. All workflows used in this testing environment can be found on the GitHub Marketplace, except the "docker-compose-test".
 
 #### Workflows
 
@@ -241,7 +241,7 @@ Every workflow gets triggered when pushing commits to the testing branch.
 
 #### Workflow example
 
-Workflow gets triggered on push to the branch "testing", when changes are made to "postgres-docker/docker-compose.yml""
+A workflow gets triggered on push to the branch "testing", when changes are made to "postgres-docker/docker-compose.yml".
 
 ```yml
 name: Push docker compose into testing
@@ -296,7 +296,9 @@ Every commit which is affected by either one of these workflows takes around 30-
 
 #### Deploying the VMs
 
-**NOTE:** Running the playbook immediately after using `terraform apply` can sometimes cause the playbook to fail at upgrading the VMs, since Cloud-init could still be running the intial setup and locking the /var/lib/dpkg/lock file. The initial command is run from ./Examensarbete
+**NOTE:** Running the playbook immediately after using `terraform apply` can sometimes cause the playbook to fail at upgrading the VMs, since Cloud-init could still be running the intial setup and locking the /var/lib/dpkg/lock file. 
+
+The initial command is run from ./Examensarbete
 
 ```bash
 cd Terraform/ && terraform apply -auto-approve
