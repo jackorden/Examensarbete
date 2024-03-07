@@ -6,7 +6,7 @@ name: actionlint
     paths: [".github/**/*.yml"]
 
 jobs:
-  run-a ctionlint:
+  run-actionlint:
     runs-on: ubuntu-latest
     permissions:
       # needed for the checkout action
