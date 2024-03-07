@@ -209,94 +209,23 @@ The argument `--extra-vars "@passwd.yml"` pulls variables from "passwd.yml", in 
 
 To be able to access the variables, the argument `--ask-vault-pass` is parsed and asks for the vault password, which unlocks the "passwd.yml" file. 
 
-The first playbook that gets executed, after the VMs are provisioned by Terraform, needs to have the argument `--ssh-common-args='-o StrictHostKeyChecking=no'` since the fresh VMs have new pairs of SSH-keys which would otherwise have to be manually approved. When running a playbook after the initial configuration, the argument can be ommited, since the keys are now stored in the client's "known_hosts" file. If the VMs are destroyed, their keys also needs to be removed from "known_hosts" before being deployed again.
+The first playbook that gets executed, after the VMs are provisioned by Terraform, needs to have the argument `--ssh-common-args='-o StrictHostKeyChecking=no'` since the fresh VMs have new pairs of SSH-keys which would otherwise have to be manually approved by the client running Ansible. When running a playbook after the initial configuration, the argument can be ommited, since the keys are now stored in the client's "known_hosts" file. If the VMs are destroyed, their keys also need to be removed from "known_hosts" before being deployed again.
 
 [Link to Code](Ansible)
 
 ### Docker
 
-Ansible installs a docker container on the host/s specified in the "inventory.ini" file using "docker compose". The "docker compose" file sets up a PostgreSQL database on port 5432 with pgAdmin on port 8080. The volumes created by the "docker compose" are destroyed when the VM is destroyed.
+Ansible installs a docker container on the host/s specified in the "inventory.ini" file using "docker compose". The "docker compose" file sets up a PostgreSQL database on port 5432 with pgAdmin on port 8080. The volumes created by the "docker compose" are destroyed when the VM running "docker compose" is destroyed.
 
 [Link to Code](postgres-docker)
-
-### GitHub
-
-This environment is split into two branches: "main" and "testing". The main branch is representing a production branch and the testing branch is representing a testing branch, where changes to the code are initially commited and tested. Before merging the two, the code that is commited to the testing branch should pass all checks, afterwards the pull request needs to be manually approved.
-
-#### Configuration of GitHub Actions 
-
-GitHub Actions is a CI/CD tool. There are several workflows in this environment. A workflow tests code on a runner provided by GitHub, also if specified, the runner can spin up a container to test changes to code. All workflows used in this testing environment can be found on the GitHub Marketplace, except the "docker-compose-test".
-
-#### Workflows
-
-Every workflow gets triggered when pushing commits to the testing branch.
-
-- The "actionlint.yml" checks syntax on commited changes to a workflow inside the .github/workflows directory. [Source](https://github.com/marketplace/actions/rhysd-actionlint)
-
-- The "ansible-lint.yml" checks the syntax on commited changes to all files with the ".yml" extension inside the ./Ansible directory. [Source](https://github.com/marketplace/actions/run-ansible-lint)
-
-- The "tflint.yml" checks syntax on all files with file extension ".tf" inside the ./Terraform directory. [Source](https://github.com/marketplace/actions/setup-tflint)
-
-- The "docker-compose-test" checks commited changes made to the "docker-compose.yml".
-
-#### Workflow example
-
-Workflow gets triggered on push to the branch "testing", when changes are made to "postgres-docker/docker-compose.yml""
-
-```yml
-name: Push docker compose into testing
-
-"on":
-  push:
-    branches: [testing]
-    paths: [postgres-docker/docker-compose.yml]
-```
-
-GitHub runs docker on an Ubuntu runner with specified ports.
-
-```yml
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    services:
-      docker:
-        image: docker:25.0.3
-        ports:
-          - 5432:5432
-          - 8080:80
-```
-
-The checkout pulls the code from our repository, runs docker compose, tests if the pgAdmin page is available with wget, then stops and cleans up everything.
-
-```yml
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Build and start Docker Compose services
-        run: |
-          docker compose -f postgres-docker/docker-compose.yml up -d
-          docker compose -f postgres-docker/docker-compose.yml ps
-
-      - name: Test service availability
-        run: |
-          wget --spider http://localhost:8080
-
-      - name: Stop and remove Docker Compose services
-        run: docker compose -f postgres-docker/docker-compose.yml down
-```
-
-#### Cost
-
-Every commit which is affected by either one of these workflows takes around 30-60 seconds for a runner to test. Every workflow that runs under 60 seconds gets billed as 1 minute. With the GitHub Team subscription the team gets 5000 CI/CD minutes/per month in total.
-
-[Link to Code](.github/workflows)
 
 ### Deployment
 
 #### Deploying the VMs
 
-**NOTE:** Running the playbook immediately after using `terraform apply` can sometimes cause the playbook to fail at upgrading the VMs, since Cloud-init could still be running the intial setup and locking the /var/lib/dpkg/lock file. The initial command is run from ./Examensarbete
+**NOTE:** Running the playbook immediately after using `terraform apply` can sometimes cause the playbook to fail at upgrading the VMs, since Cloud-init could still be running the intial setup and locking the /var/lib/dpkg/lock file. 
+
+The initial command is run from ./Examensarbete
 
 ```bash
 cd Terraform/ && terraform apply -auto-approve
@@ -352,3 +281,76 @@ Apply complete! Resources: 0 added, 0 changed, 3 destroyed.
 ```
 
 Before deploying again, manually remove the hosts SSH-keys from the "./ssh/known_hosts" file.
+
+### GitHub
+
+This environment is split into two branches: "main" and "testing". The main branch is representing a production branch and the testing branch is where changes to the code are initially commited and tested. Before merging the two, the code that is commited to the testing branch should pass all checks, afterwards the pull request needs to be manually approved.
+
+#### Configuration of GitHub Actions 
+
+GitHub Actions is a CI/CD tool. There are several workflows in this environment. A workflow tests code on a runner provided by GitHub, also if specified, the runner can spin up a container to test changes made to code. All workflows used in this testing environment can be found on the GitHub Marketplace, except the "docker-compose-test".
+
+#### Workflows
+
+Every workflow gets triggered when pushing commits to the testing branch.
+
+- The "actionlint.yml" checks syntax on commited changes to a workflow inside the .github/workflows directory. [Source](https://github.com/marketplace/actions/rhysd-actionlint)
+
+- The "ansible-lint.yml" checks the syntax on commited changes to all files with the ".yml" extension inside the ./Ansible directory. [Source](https://github.com/marketplace/actions/run-ansible-lint)
+
+- The "tflint.yml" checks syntax on all files with file extension ".tf" inside the ./Terraform directory. [Source](https://github.com/marketplace/actions/setup-tflint)
+
+- The "docker-compose-test" checks commited changes made to the "docker-compose.yml".
+
+#### Workflow example
+
+A workflow gets triggered on push to the branch "testing", when changes are made to "postgres-docker/docker-compose.yml".
+
+```yml
+name: Push docker compose into testing
+
+"on":
+  push:
+    branches: [testing]
+    paths: [postgres-docker/docker-compose.yml]
+```
+
+GitHub runs docker on an Ubuntu runner with specified ports.
+
+```yml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:25.0.3
+        ports:
+          - 5432:5432
+          - 8080:80
+```
+
+The checkout pulls the code from our repository, runs docker compose, tests if the pgAdmin page is available with wget, then stops and cleans up everything.
+
+```yml
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and start Docker Compose services
+        run: |
+          docker compose -f postgres-docker/docker-compose.yml up -d
+          docker compose -f postgres-docker/docker-compose.yml ps
+
+      - name: Test service availability
+        run: |
+          wget --spider http://localhost:8080
+
+      - name: Stop and remove Docker Compose services
+        run: docker compose -f postgres-docker/docker-compose.yml down
+```
+
+#### Cost
+
+Every commit which is affected by either one of these workflows takes around 30-60 seconds for a runner to test. Every workflow that runs under 60 seconds gets billed as 1 minute. With the GitHub Team subscription the team gets 5000 CI/CD minutes/per month in total.
+
+[Link to Code](.github/workflows)
