@@ -219,6 +219,69 @@ Ansible installs a docker container on the host/s specified in the "inventory.in
 
 [Link to Code](postgres-docker)
 
+### Deployment
+
+#### Deploying the VMs
+
+**NOTE:** Running the playbook immediately after using `terraform apply` can sometimes cause the playbook to fail at upgrading the VMs, since Cloud-init could still be running the intial setup and locking the /var/lib/dpkg/lock file. 
+
+The initial command is run from ./Examensarbete
+
+```bash
+cd Terraform/ && terraform apply -auto-approve
+cd ../Ansible/ && ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'
+```
+It takes around two and half minutes to provision the VMs.
+
+```bash
+Plan: 3 to add, 0 to change, 0 to destroy. 
+
+proxmox_virtual_environment_vm.tango-test["tango-test3"]: Creating... 
+
+proxmox_virtual_environment_vm.tango-test["tango-test1"]: Creating... 
+
+proxmox_virtual_environment_vm.tango-test["tango-test2"]: Creating... 
+elapsed] 
+
+proxmox_virtual_environment_vm.tango-test["tango-test3"]: Creation complete after 2m12s [id=101] 
+
+proxmox_virtual_environment_vm.tango-test["tango-test2"]: Creation complete after 2m12s [id=102] 
+
+proxmox_virtual_environment_vm.tango-test["tango-test1"]: Creation complete after 2m17s [id=100] 
+
+Apply complete! Resources: 3 added, 0 changed, 0 destroyed. 
+```
+
+The initial configuration of the VMs takes around two minutes.
+
+![ansible-play-recap](images/image6.png)
+
+#### Destroying the VMs
+
+```bash
+cd Terraform/ && terraform apply -destroy -auto-approve
+```
+
+```bash
+Plan: 0 to add, 0 to change, 3 to destroy. 
+
+proxmox_virtual_environment_vm.tango-test["tango-test3"]: Destroying... [id=101] 
+
+proxmox_virtual_environment_vm.tango-test["tango-test2"]: Destroying... [id=102] 
+
+proxmox_virtual_environment_vm.tango-test["tango-test1"]: Destroying... [id=100] 
+
+proxmox_virtual_environment_vm.tango-test["tango-test3"]: Destruction complete after 7s 
+
+proxmox_virtual_environment_vm.tango-test["tango-test2"]: Destruction complete after 7s 
+
+proxmox_virtual_environment_vm.tango-test["tango-test1"]: Destruction complete after 7s 
+
+Apply complete! Resources: 0 added, 0 changed, 3 destroyed. 
+```
+
+Before deploying again, manually remove the hosts SSH-keys from the "./ssh/known_hosts" file.
+
 ### GitHub
 
 This environment is split into two branches: "main" and "testing". The main branch is representing a production branch and the testing branch is where changes to the code are initially commited and tested. Before merging the two, the code that is commited to the testing branch should pass all checks, afterwards the pull request needs to be manually approved.
@@ -291,66 +354,3 @@ The checkout pulls the code from our repository, runs docker compose, tests if t
 Every commit which is affected by either one of these workflows takes around 30-60 seconds for a runner to test. Every workflow that runs under 60 seconds gets billed as 1 minute. With the GitHub Team subscription the team gets 5000 CI/CD minutes/per month in total.
 
 [Link to Code](.github/workflows)
-
-### Deployment
-
-#### Deploying the VMs
-
-**NOTE:** Running the playbook immediately after using `terraform apply` can sometimes cause the playbook to fail at upgrading the VMs, since Cloud-init could still be running the intial setup and locking the /var/lib/dpkg/lock file. 
-
-The initial command is run from ./Examensarbete
-
-```bash
-cd Terraform/ && terraform apply -auto-approve
-cd ../Ansible/ && ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'
-```
-It takes around two and half minutes to provision the VMs.
-
-```bash
-Plan: 3 to add, 0 to change, 0 to destroy. 
-
-proxmox_virtual_environment_vm.tango-test["tango-test3"]: Creating... 
-
-proxmox_virtual_environment_vm.tango-test["tango-test1"]: Creating... 
-
-proxmox_virtual_environment_vm.tango-test["tango-test2"]: Creating... 
-elapsed] 
-
-proxmox_virtual_environment_vm.tango-test["tango-test3"]: Creation complete after 2m12s [id=101] 
-
-proxmox_virtual_environment_vm.tango-test["tango-test2"]: Creation complete after 2m12s [id=102] 
-
-proxmox_virtual_environment_vm.tango-test["tango-test1"]: Creation complete after 2m17s [id=100] 
-
-Apply complete! Resources: 3 added, 0 changed, 0 destroyed. 
-```
-
-The initial configuration of the VMs takes around two minutes.
-
-![ansible-play-recap](images/image6.png)
-
-#### Destroying the VMs
-
-```bash
-cd Terraform/ && terraform apply -destroy -auto-approve
-```
-
-```bash
-Plan: 0 to add, 0 to change, 3 to destroy. 
-
-proxmox_virtual_environment_vm.tango-test["tango-test3"]: Destroying... [id=101] 
-
-proxmox_virtual_environment_vm.tango-test["tango-test2"]: Destroying... [id=102] 
-
-proxmox_virtual_environment_vm.tango-test["tango-test1"]: Destroying... [id=100] 
-
-proxmox_virtual_environment_vm.tango-test["tango-test3"]: Destruction complete after 7s 
-
-proxmox_virtual_environment_vm.tango-test["tango-test2"]: Destruction complete after 7s 
-
-proxmox_virtual_environment_vm.tango-test["tango-test1"]: Destruction complete after 7s 
-
-Apply complete! Resources: 0 added, 0 changed, 3 destroyed. 
-```
-
-Before deploying again, manually remove the hosts SSH-keys from the "./ssh/known_hosts" file.
