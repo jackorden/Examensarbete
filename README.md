@@ -37,6 +37,7 @@ wget https://cloudimages.ubuntu.com/minimal/releases/jammy/release/ubuntu-22.04-
 - Delete scsi0 disk
 - Add CloudInit Drive: local-lvm
 - CloudInit settings
+  - uses SSH public key from the client that will be running Ansible, located in ./SSH-keys
   
 ![cloudinit](images/image1.png)
 
@@ -107,17 +108,73 @@ Terraform is the tool used to provision the VMs inside this testing environment.
   - Version: ">= 0.46.6"
   - https://registry.terraform.io/providers/bpg/proxmox/latest
 
-[Link to Code](Terraform)
-
 In order to provision resources on the endpoint, a client with Terraform is needed.
 
-Version
+#### Terraform version
 
 ```bash
 terraform --version
 Terraform v1.7.4
 on linux_amd64
 ```
+
+
+#### Terraform configuration
+
+`terraform apply` uses the "ubuntu-test.tf" file to provision VMs, which contains a loop that goes through a list of variables inside the "vars.tf" file.
+
+##### vars.tf
+
+List
+
+```hcl
+variable "vm_config" {
+    type = list(object({
+        idx = number
+        name = string
+        vmid_to_clone = number
+        cpu = number
+        ram = number
+        size = number
+    }))
+```
+
+The specifications of our VMs are written in "vars.tf"
+
+```hcl
+    default = [
+    {
+        idx = 0
+        name = "tango-test1"
+        vmid_to_clone = 1000
+        cpu = 1
+        ram = 2048
+        size = 32
+    }
+```
+
+##### ubuntu-test.tf
+
+Loop
+
+```hcl
+    for_each = {
+        for index,vm in var.vm_config:
+        vm.name => vm
+    }
+```
+
+
+Example: "each.value.ram" pulls the value "ram" from the list in "vars.tf". The VMs ram in this case will be 2048 MB.
+
+```hcl
+    memory {
+        dedicated = each.value.ram
+    }
+```
+
+
+[Link to Code](Terraform)
 
 #### Cloud-init
 
@@ -127,7 +184,7 @@ The testing template "ubuntu-2204-template1" uses Cloud-init, which means that t
 
 In order to configure multiple VMs, a client with Ansible is needed.
 
-Version
+#### Ansible version
 
 ```bash
 ansible --version
@@ -239,7 +296,7 @@ Every commit which is affected by either one of these workflows takes around 30-
 
 #### Deploying the VMs
 
-**NOTE:** Running the playbook immediately after using `terraform apply` can sometimes cause the playbook to fail at upgrading the VMs, since Cloud-init is still running the intial setup. The initial command is run from /Examensarbete
+**NOTE:** Running the playbook immediately after using `terraform apply` can sometimes cause the playbook to fail at upgrading the VMs, since Cloud-init could still be running the intial setup and locking the /var/lib/dpkg/lock file. The initial command is run from ./Examensarbete
 
 ```bash
 cd Terraform/ && terraform apply -auto-approve
@@ -294,4 +351,4 @@ proxmox_virtual_environment_vm.tango-test["tango-test1"]: Destruction complete a
 Apply complete! Resources: 0 added, 0 changed, 3 destroyed. 
 ```
 
-Remove the hosts from the "./ssh/known_hosts" file.
+Before deploying again, manually remove the hosts SSH-keys from the "./ssh/known_hosts" file.
