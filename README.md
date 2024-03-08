@@ -165,7 +165,7 @@ Loop
 ```
 
 
-Example: "each.value.ram" pulls the value "ram" from the list in "vars.tf". The VMs ram in this case will be 2048 MB.
+Example: "each.value.ram" pulls the value "ram" from the list in "vars.tf". The VMs RAM in this case will be 2048 MB.
 
 ```hcl
     memory {
@@ -223,7 +223,7 @@ Ansible installs a docker container on the host/s specified in the "inventory.in
 
 #### Deploying the VMs
 
-**NOTE:** Running the playbook immediately after using `terraform apply` can sometimes cause the playbook to fail at upgrading the VMs, since Cloud-init could still be running the intial setup and locking the /var/lib/dpkg/lock file. 
+**NOTE:** Running the playbook immediately after using `terraform apply` can sometimes cause the playbook to fail at upgrading the VMs, since Cloud-init could still be running the intial setup and locking the /var/lib/dpkg/lock file.
 
 The initial command is run from ./Examensarbete
 
