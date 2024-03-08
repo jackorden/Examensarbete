@@ -231,7 +231,7 @@ The initial command is run from ./Examensarbete
 cd Terraform/ && terraform apply -auto-approve
 cd ../Ansible/ && ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'
 ```
-It takes around two and half minutes to provision the VMs.
+It takes around two and half minutes to provision three VMs.
 
 ```bash
 Plan: 3 to add, 0 to change, 0 to destroy. 
