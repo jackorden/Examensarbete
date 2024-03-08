@@ -22,8 +22,13 @@ jobs:
         run: |
           docker compose -f postgres-docker/docker-compose.yml up -d
           docker compose -f postgres-docker/docker-compose.yml ps
+      
+      - name: Test database connectivity
+        run: |
+          sudo apt install -y postgresql-client
+          pg_isready -d postgres -h 10.6.67.224 -p 5432 -U jack
 
-      - name: Test service availability
+      - name: Test pgAdmin availability
         run: |
           wget --spider http://localhost:8080
 
