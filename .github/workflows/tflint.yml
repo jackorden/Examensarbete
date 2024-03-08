@@ -6,10 +6,10 @@ name: Tflint
     paths: ["Terraform/**/*.tf"]
 
 jobs:
-    tflint:
-      runs-on: ubuntu-latest
+  tflint:
+    runs-on: ubuntu-latest
 
-      steps:
+    steps:
       - uses: actions/checkout@v4
         name: Checkout source code
 
