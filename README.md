@@ -329,7 +329,7 @@ jobs:
           - 8080:80
 ```
 
-The checkout pulls the code from our repository, runs docker compose, tests if the pgAdmin page is available with wget, then stops and cleans up everything.
+The checkout pulls the code from our repository, runs docker compose, tests the connectivity to the database "postgres" on port 5432 with the user "jack", afterwards tests if the pgAdmin page is available with wget, then stops and cleans up everything.
 
 ```yml
     steps:
@@ -340,6 +340,11 @@ The checkout pulls the code from our repository, runs docker compose, tests if t
         run: |
           docker compose -f postgres-docker/docker-compose.yml up -d
           docker compose -f postgres-docker/docker-compose.yml ps
+      
+      - name: Test database connectivity
+        run: |
+          sudo apt install -y postgresql-client
+          pg_isready -d postgres -h localhost -p 5432 -U jack
 
       - name: Test service availability
         run: |
@@ -348,6 +353,9 @@ The checkout pulls the code from our repository, runs docker compose, tests if t
       - name: Stop and remove Docker Compose services
         run: docker compose -f postgres-docker/docker-compose.yml down
 ```
+
+Example of workflow failing:
+Example of workflow succedeing:
 
 #### Cost
 
