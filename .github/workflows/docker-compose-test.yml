@@ -22,7 +22,7 @@ jobs:
         run: |
           docker compose -f postgres-docker/docker-compose.yml up -d
           docker compose -f postgres-docker/docker-compose.yml ps
-      
+
       - name: Test database connectivity
         run: |
           sudo apt install -y postgresql-client
