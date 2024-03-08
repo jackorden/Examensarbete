@@ -352,8 +352,13 @@ The checkout pulls the code from our repository, runs docker compose, tests the 
         run: docker compose -f postgres-docker/docker-compose.yml down
 ```
 
-Example of workflow failing:
-Example of workflow succedeing:
+Example of workflow failing and giving an error code, making it easier to troubleshoot.
+
+![workflow-fail](images/image7.png)
+
+Example of workflow succeding:
+
+![workflow-success](images/image8.png)
 
 #### Cost
 
