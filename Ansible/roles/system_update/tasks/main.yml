@@ -18,8 +18,8 @@
   ansible.builtin.apt:
     update_cache: true
 # Enable if cloud-init setting is "Upgrade: Yes".
-#- name: Upgrade all packages
-#  ansible.builtin.apt:
+# - name: Upgrade all packages
+#   ansible.builtin.apt:
 #    upgrade: true
 # If qemu-guest-agent isn't installed, installs it.
 - name: Install qemu-guest-agent
