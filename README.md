@@ -61,7 +61,7 @@ Next, the image is resized before using it in Proxmox:
 
 ```bash
 qemu-img resize [image_name] [size] 
-``` 
+```
 
 The template size in this environment is 32GB.
 
@@ -98,7 +98,7 @@ qm importdisk [vmid] [image_name] local-lvm
 
 Terraform is the tool used to provision the VMs inside this testing environment. In order to use it, an endpoint, an API-token and a provider API are needed:
 
-- Endpoint: https://10.6.67.221:8006
+- Endpoint: [10.6.67.221:8006](https://10.6.67.221:8006)
 - API-token was created in Proxmox and stored in the file "credentials.tf". This is used to connect to the Proxmox node "pve" through Terraform.
 
 ![api-token](images/image4.png)
@@ -106,7 +106,7 @@ Terraform is the tool used to provision the VMs inside this testing environment.
 - Provider API:
   - "bpg/proxmox"
   - Version: ">= 0.46.6"
-  - https://registry.terraform.io/providers/bpg/proxmox/latest
+  - [Source](https://registry.terraform.io/providers/bpg/proxmox/latest)
 
 In order to provision resources on the endpoint, a client with Terraform is needed.
 
@@ -117,7 +117,6 @@ terraform --version
 Terraform v1.7.4
 on linux_amd64
 ```
-
 
 #### Terraform configuration
 
@@ -164,7 +163,6 @@ Loop
     }
 ```
 
-
 Example: "each.value.ram" pulls the value "ram" from the list in "vars.tf". The VMs RAM in this case will be 2048 MB.
 
 ```hcl
@@ -172,7 +170,6 @@ Example: "each.value.ram" pulls the value "ram" from the list in "vars.tf". The 
         dedicated = each.value.ram
     }
 ```
-
 
 [Link to Code](Terraform)
 
@@ -207,7 +204,7 @@ Ansible Vault is set up, which encrypts files and variables. In this environment
 
 The argument `--extra-vars "@passwd.yml"` pulls variables from "passwd.yml", in this case the sudo password.
 
-To be able to access the variables, the argument `--ask-vault-pass` is parsed and asks for the vault password, which unlocks the "passwd.yml" file. 
+To be able to access the variables, the argument `--ask-vault-pass` is parsed and asks for the vault password, which unlocks the "passwd.yml" file.
 
 The first playbook that gets executed, after the VMs are provisioned by Terraform, needs to have the argument `--ssh-common-args='-o StrictHostKeyChecking=no'` since the fresh VMs have new pairs of SSH-keys which would otherwise have to be manually approved by the client running Ansible. When running a playbook after the initial configuration, the argument can be ommited, since the keys are now stored in the client's "known_hosts" file. If the VMs are destroyed, their keys also need to be removed from "known_hosts" before being deployed again.
 
@@ -231,6 +228,7 @@ The initial command is run from ./Examensarbete
 cd Terraform/ && terraform apply -auto-approve
 cd ../Ansible/ && ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'
 ```
+
 It takes around two and half minutes to provision three VMs.
 
 ```bash
@@ -286,7 +284,7 @@ Before deploying again, manually remove the hosts SSH-keys from the "./ssh/known
 
 This environment is split into two branches: "main" and "testing". The main branch is representing a production branch and the testing branch is where changes to the code are initially commited and tested. Before merging the two, the code that is commited to the testing branch should pass all checks, afterwards the pull request needs to be manually approved.
 
-#### Configuration of GitHub Actions 
+#### Configuration of GitHub Actions
 
 GitHub Actions is a CI/CD tool. There are several workflows in this environment. A workflow tests code on a runner provided by GitHub, also if specified, the runner can spin up a container to test changes made to code. All workflows used in this testing environment can be found on the GitHub Marketplace, except the "docker-compose-test".
 
