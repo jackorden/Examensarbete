@@ -294,7 +294,7 @@ Every workflow gets triggered when pushing commits to the testing branch.
 
 - The "actionlint.yml" checks syntax on commited changes to a workflow inside the .github/workflows directory. [Source](https://github.com/marketplace/actions/rhysd-actionlint)
 
-- The "ansible-lint.yml" checks the syntax on commited changes to all files with the ".yml" extension inside the ./Ansible directory. [Source](https://github.com/marketplace/actions/run-ansible-lint)
+- The "ansible-lint.yml" checks the syntax on commited changes to all files with the ".yml" extension inside the whole repository. Even though it's meant for Ansible, it still provides basic linting for other .yml-files. [Source](https://github.com/marketplace/actions/run-ansible-lint)
 
 - The "tflint.yml" checks syntax on all files with file extension ".tf" inside the ./Terraform directory. [Source](https://github.com/marketplace/actions/setup-tflint)
 
