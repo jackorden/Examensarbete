@@ -17,25 +17,25 @@ jobs:
         name: Setup TFLint
         with:
           tflint_version: v0.50.3
- 
+
       - name: Show version
         run: tflint --version
-  
+
       - name: Init TFLint
         working-directory: ./Terraform
         run: tflint --init
         env:
           # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
           GITHUB_TOKEN: ${{ github.token }}
-  
+
       - uses: terraform-linters/setup-tflint@v4
         with:
           tflint_wrapper: true
-      
+
       - id: tflint
         working-directory: ./Terraform
         run: tflint -f compact
-      
+
       - run: echo ${{ steps.tflint.outputs.stdout }}
       - run: echo ${{ steps.tflint.outputs.stderr }}
       - run: echo ${{ steps.tflint.outputs.exitcode }}

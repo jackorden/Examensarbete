@@ -4,7 +4,6 @@ name: ansible-lint
 "on":
   push:
     branches: [testing]
-    paths: ["Ansible/**/*.yml"]
 
 jobs:
   build:
@@ -19,3 +18,4 @@ jobs:
 
       - name: Run ansible-lint
         uses: ansible/ansible-lint-action@v6
+
