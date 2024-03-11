@@ -4,6 +4,8 @@ name: Tflint
   push:
     branches: [testing]
     paths: ["Terraform/**/*.tf"]
+  pull_request:
+    branches: [main]
 
 jobs:
   tflint:
