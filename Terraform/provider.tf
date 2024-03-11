@@ -12,7 +12,7 @@ terraform {
 
 }
 
-provider "asd" {
+provider "asdfg" {
 
     endpoint = var.virtual_environment_endpoint
     api_token = var.virtual_environment_password
