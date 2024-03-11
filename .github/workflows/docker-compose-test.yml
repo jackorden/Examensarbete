@@ -5,7 +5,7 @@ name: Push docker compose into testing
     branches: [testing]
     paths: [postgres-docker/docker-compose.yml]
   pull_request:
-    branches: [main]    
+    branches: [main]
 
 jobs:
   test:
