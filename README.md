@@ -314,7 +314,7 @@ Every workflow gets triggered when pushing commits to the testing branch or when
 
 #### Workflow example
 
-A workflow gets triggered when changes are made to "postgres-docker/docker-compose.yml" and gets pushed to the branch "testing" or on a pull request to "main".
+A workflow gets triggered when changes are made to "postgres-docker/docker-compose.yml" and gets pushed to the branch "testing" or on a pull request to "main". On a pull request to main, all files get within the repository gets checked.
 
 The "on" in parenthesis is to avoid ansible-lint error: "*Truthy value should be one of \[false, true]*"
 
