@@ -4,8 +4,6 @@ name: actionlint
   push:
     branches: [testing]
     paths: [".github/**/*.yml"]
-  pull_request:
-    branches: [main]
 
 jobs:
   run-actionlint:
