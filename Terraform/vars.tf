@@ -34,3 +34,4 @@ variable "vm_config" {
     }
     ]
 }
+asd

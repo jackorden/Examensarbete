@@ -12,7 +12,7 @@ terraform {
 
 }
 
-provider "proxmox" {
+provider "asd" {
 
     endpoint = var.virtual_environment_endpoint
     api_token = var.virtual_environment_password
