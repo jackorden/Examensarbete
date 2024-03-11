@@ -1,5 +1,6 @@
 name: actionlint
-on:
+
+"on":
   push:
     branches: [testing]
     paths: [".github/**/*.yml"]
