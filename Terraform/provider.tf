@@ -3,7 +3,7 @@ terraform {
     required_version = ">= 0.14"
 
     required_providers {
-        proxmox = {
+        proxermox = {
             source = "bpg/proxmox"
             version = ">= 0.46.6"
         }
