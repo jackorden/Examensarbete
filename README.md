@@ -302,7 +302,7 @@ GitHub Actions is a CI/CD tool. There are several workflows in this environment.
 
 #### Workflows
 
-Every workflow gets triggered when pushing commits to the testing branch or when doing a pull request to main branch. On a pull request to main, all files within the repository gets tested.
+Every workflow gets triggered when pushing commits to the testing branch or when doing a pull request to main branch. On a pull request to main, all files within the repository get tested.
 
 - The "actionlint.yml" checks syntax on commited changes to a workflow inside the .github/workflows directory. [Source](https://github.com/marketplace/actions/rhysd-actionlint)
 
