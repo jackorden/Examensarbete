@@ -327,7 +327,7 @@ jobs:
           - 8080:80
 ```
 
-The checkout pulls the code from our repository, runs docker compose, tests the connectivity to the database "postgres" on port 5432 with the user "jack", afterwards tests if the pgAdmin page is available with wget, then stops and cleans up everything.
+The checkout pulls the code from this repository, runs docker compose, tests the connectivity to the database "postgres" on port 5432 with the user "jack", afterwards tests if the pgAdmin page is available with wget, then stops and cleans up everything.
 
 ```yml
     steps:
