@@ -34,4 +34,3 @@ jobs:
 
       - name: Stop and remove Docker Compose services
         run: docker compose -f postgres-docker/docker-compose.yml down
-# test
