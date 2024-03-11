@@ -290,7 +290,7 @@ GitHub Actions is a CI/CD tool. There are several workflows in this environment.
 
 #### Workflows
 
-Every workflow gets triggered when pushing commits to the testing branch.
+Every workflow gets triggered when pushing commits to the testing branch or when doing a pull request to main branch.
 
 - The "actionlint.yml" checks syntax on commited changes to a workflow inside the .github/workflows directory. [Source](https://github.com/marketplace/actions/rhysd-actionlint)
 
@@ -302,7 +302,9 @@ Every workflow gets triggered when pushing commits to the testing branch.
 
 #### Workflow example
 
-A workflow gets triggered on push to the branch "testing", when changes are made to "postgres-docker/docker-compose.yml".
+A workflow gets triggered when changes are made to "postgres-docker/docker-compose.yml" and gets pushed to the branch "testing" or on a pull request to "main".
+
+The "on" in parenthesis is to avoid ansible-lint error: "*Truthy value should be one of \[false, true]*"
 
 ```yml
 name: Push docker compose into testing
@@ -311,6 +313,8 @@ name: Push docker compose into testing
   push:
     branches: [testing]
     paths: [postgres-docker/docker-compose.yml]
+  pull-request:
+    branches: [main]
 ```
 
 GitHub runs docker on an Ubuntu runner with specified ports.
@@ -327,7 +331,7 @@ jobs:
           - 8080:80
 ```
 
-The checkout pulls the code from this repository, runs docker compose, tests the connectivity to the database "postgres" on port 5432 with the user "jack", afterwards tests if the pgAdmin page is available with wget, then stops and cleans up everything.
+The checkout pulls the code from this repository, runs docker compose, tests the connectivity to the database "postgres" on port 5432 with the user "jack", afterwards tests if the pgAdmin page is available with wget on port 8080, then stops and cleans up everything.
 
 ```yml
     steps:
@@ -359,6 +363,14 @@ Example of workflow failing and giving an error code, making it easier to troubl
 Example of workflow succeding:
 
 ![workflow-success](images/image8.png)
+
+Example of manually closing pull request that doesn't meet requirements:
+
+![pullrequest-failure](images/image9.png)
+
+Example of manually approving pull request that meet requirements:
+
+![pullrequest-success](images/image10.png)
 
 #### Cost
 
