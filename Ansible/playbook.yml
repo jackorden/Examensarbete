@@ -7,4 +7,3 @@
   hosts: docker
   roles:
     - docker
-asd
