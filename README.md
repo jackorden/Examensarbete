@@ -175,7 +175,19 @@ Example: "each.value.ram" pulls the value "ram" from the list in "vars.tf". The 
 
 #### Cloud-init
 
-The testing template "ubuntu-2204-template1" uses Cloud-init, which means that the settings which were set applies to every VM created using said template. However, these settings can be overridden if we specify these Cloud-init settings inside the .tf file that is applied through `terraform apply`.
+The testing template "ubuntu-2204-template1" uses Cloud-init, which means that the settings which were set applies to every VM created using said template. However, these settings can be overridden if we specify these Cloud-init settings under "initialization" inside the .tf file that is applied through `terraform apply`. For example, the template's standard ip configuration is set to "ip=dhcp", but is overriden by following code:
+
+```hcl
+initialization {
+        ip_config {
+            ipv4 {
+                address = format("%s%s%s","10.6.67.",222 + each.value.idx,"/24")
+                gateway = "10.6.67.1"
+            }
+        }
+ 
+    }
+```
 
 ### Ansible
 
@@ -206,7 +218,7 @@ The argument `--extra-vars "@passwd.yml"` pulls variables from "passwd.yml", in 
 
 To be able to access the variables, the argument `--ask-vault-pass` is parsed and asks for the vault password, which unlocks the "passwd.yml" file.
 
-The first playbook that gets executed, after the VMs are provisioned by Terraform, needs to have the argument `--ssh-common-args='-o StrictHostKeyChecking=no'` since the fresh VMs have new pairs of SSH-keys which would otherwise have to be manually approved by the client running Ansible. When running a playbook after the initial configuration, the argument can be ommited, since the keys are now stored in the client's "known_hosts" file. If the VMs are destroyed, their keys also need to be removed from "known_hosts" before being deployed again.
+The first playbook that gets run, after the VMs are provisioned by Terraform, needs to have the argument `--ssh-common-args='-o StrictHostKeyChecking=no'` since the fresh VMs have new pairs of SSH-keys which would otherwise have to be manually approved by the client running Ansible. When running a playbook after the initial configuration, the argument can be ommited, since the keys are now stored in the client's "known_hosts" file. If the VMs are destroyed, their keys should be removed from "known_hosts" before being deployed again.
 
 [Link to Code](Ansible)
 
@@ -250,7 +262,7 @@ proxmox_virtual_environment_vm.tango-test["tango-test1"]: Creation complete afte
 Apply complete! Resources: 3 added, 0 changed, 0 destroyed. 
 ```
 
-The initial configuration of the VMs takes around two minutes.
+The initial configuration (playbook) of the VMs takes around two minutes.
 
 ![ansible-play-recap](images/image6.png)
 
@@ -278,11 +290,11 @@ proxmox_virtual_environment_vm.tango-test["tango-test1"]: Destruction complete a
 Apply complete! Resources: 0 added, 0 changed, 3 destroyed. 
 ```
 
-Before deploying again, manually remove the hosts SSH-keys from the "./ssh/known_hosts" file.
+Before deploying again, remove the hosts SSH-keys from the "./ssh/known_hosts" file.
 
 ### GitHub
 
-This environment is split into two branches: "main" and "testing". The main branch is representing a production branch and the testing branch is where changes to the code are initially commited and tested. Before merging the two, the code that is commited to the testing branch should pass all checks, afterwards the pull request needs to be manually approved.
+This environment is split into two branches: "main" and "testing". The main branch is representing a production branch and the testing branch is where changes to the code are initially commited and tested. Before merging the two, the code that is commited to the testing branch should pass all checks on pushing and on pull request to the main branch. If the tests fail, the pull request should be manually closed. If the tests succeed, the pull request needs to be manually approved.
 
 #### Configuration of GitHub Actions
 
