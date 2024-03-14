@@ -5,7 +5,7 @@
 ### How to setup the testing environment
 
 1. Requirements:
-   1. A Linux client, preferably Ubuntu 22.04.4 LTS, with Ansible core version >=2.16.4 and Terraform version >=1.7.4 installed.
+   1. Linux client, preferably Ubuntu 22.04.4 LTS, with Ansible core version >=2.16.4 and Terraform version >=1.7.4 installed.
    2. Connected to the testing network 10.6.67.0/24
 2. Log in to Tango AB's GitHub [repository](https://github.com/jackorden/Examensarbete) with your company GitHub account, which is connected to Tango AB's GitHub Team's subscription.
 3. Download the repository to your client either by cloning it through a terminal `git clone <url>` or ZIP-file.
@@ -16,6 +16,7 @@
 6. To quickly destroy the environment: `cd Terraform/ && terraform apply -destroy -auto-approve`
 
 ### How to use GitHub Actions
+
 Inside GitHub, click on the Actions tab. To the left you can see all the workflows which are active. In the middle of the screen you see actions getting triggered by commited code.
 
 ![action](images/image11.png)
