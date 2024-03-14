@@ -4,7 +4,9 @@
 
 ### How to setup the testing environment
 
-1. Requirements: A Linux client, preferably Ubuntu 22.04.4 LTS, with Ansible core version >=2.16.4 and Terraform version >=1.7.4 installed.
+1. Requirements:
+   1. A Linux client, preferably Ubuntu 22.04.4 LTS, with Ansible core version >=2.16.4 and Terraform version >=1.7.4 installed.
+   2. Connected to the testing network 10.6.67.0/24
 2. Log in to Tango AB's GitHub [repository](https://github.com/jackorden/Examensarbete) with your company GitHub account, which is connected to Tango AB's GitHub Team's subscription.
 3. Download the repository to your client either by cloning it through a terminal `git clone <url>` or ZIP-file.
 4. Inisde the cloned repo, or unzipped file, open a terminal window inside the root of the directory (./Examensarbete) and run following commands:
