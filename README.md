@@ -38,8 +38,6 @@ Example of manually approving a pull request that meets requirements:
 
 Every commit which is affected by either one of these workflows takes around 30-60 seconds for a runner to test. Every workflow that runs under 60 seconds gets billed as 1 minute. With the GitHub Team subscription the team gets 5000 CI/CD minutes/per month in total.
 
-[Link to Code](.github/workflows)
-
 # Configuration of Proxmox
 The testing environment is running on a virtualized Proxmox server on Tango AB's bare metal Proxmox cluster which has nested virtualization enabled.
 
@@ -412,3 +410,5 @@ The checkout pulls the code from this repository, runs docker compose, tests the
       - name: Stop and remove Docker Compose services
         run: docker compose -f postgres-docker/docker-compose.yml down
 ```
+
+[Link to Code](.github/workflows)
