@@ -2,8 +2,52 @@
 
 ## Quick guide
 
-## Configuration of Proxmox
+### How to setup the testing environment
 
+1. Requirements: A Linux client, preferably Ubuntu 22.04.4 LTS, with Ansible core version >=2.16.4 and Terraform version >=1.7.4 installed.
+2. Go to Tango AB's GitHub [repository](https://github.com/jackorden/Examensarbete).
+3. To gain access, log in to [GitHub](https://www.GitHub.com) with your company GitHub account, which is connected to Tango AB's GitHub Team's subscription.
+4. Download the repository to your client either by cloning it through a terminal `git clone <url>` or ZIP-file.
+5. Inisde the cloned repo, or unzipped file, open a terminal window inside the root of the directory (./Examensarbete) and run following commands:
+    1. Provision the VMs: `cd Terraform/ && terraform apply -auto-approve`
+    2. Configure the VMs: `cd ../Ansible/ && ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'`
+6. Anyone from IT/Dev can now connect to any of the deployed VMs using SSH.
+7. To quickly destroy the environment: `cd Terraform/ && terraform apply -destroy -auto-approve`
+
+### How to use GitHub Actions
+Inside GitHub, click on the Actions tab. To the left you can see all the workflows which are active. In the middle of the screen you see actions getting triggered by commited code.
+
+![action](images/image11.png)
+
+Example of workflow failing and giving an error code, making it easier to troubleshoot.
+
+![workflow-fail](images/image7.png)
+
+Example of workflow succeding:
+
+![workflow-success](images/image8.png)
+
+Example of manually closing a pull request that doesn't meet requirements:
+
+![pullrequest-failure](images/image9.png)
+
+Example of manually approving a pull request that meets requirements:
+
+![pullrequest-success](images/image10.png)
+
+#### Cost
+
+Every commit which is affected by either one of these workflows takes around 30-60 seconds for a runner to test. Every workflow that runs under 60 seconds gets billed as 1 minute. With the GitHub Team subscription the team gets 5000 CI/CD minutes/per month in total.
+
+[Link to Code](.github/workflows)
+
+# Configuration of Proxmox
+The testing environment is running on a virtualized Proxmox server on Tango AB's bare metal Proxmox cluster which has nested virtualization enabled.
+
+- VM
+- RAM: 32GB
+- Disk: 1TB
+- CPU: 4 cores
 - Version: 8.1.3
 - Hostname: pve
 - Username: root
@@ -11,14 +55,14 @@
 - Gateway: 10.6.67.1/24
 - Port: 8006
 
-### Storage
+## Storage
 
 - local: Here is where ISO images, CT containers and backups are stored.
 - local-lvm: Here is where the VM disks and corresponding cloudinit and CT volumes are stored. The templates used by the VMs are also stored here.
 
 ![storage](images/image5.png)
 
-### VM template
+## VM template
 
 In order to automate the creation of virtual machines they are cloned from a template. The image used to create the template, which the test VMs are based on, is a cloud image.  
 
@@ -30,7 +74,7 @@ On the Proxmox node "pve" the cloud image is installed using the shell command `
 wget https://cloudimages.ubuntu.com/minimal/releases/jammy/release/ubuntu-22.04-minimal-cloudimg-amd64.img" 
 ```
 
-#### These are the non-default settings used to create the  VM template
+### Non-default settings used to create the  VM template
 
 - Name: ubuntu-2204-template1
 - VMID: 1000
@@ -43,9 +87,9 @@ wget https://cloudimages.ubuntu.com/minimal/releases/jammy/release/ubuntu-22.04-
   
 ![cloudinit](images/image1.png)
 
-#### Shell
+### Shell
 
-Afterwards, some shell commands are executed on the Proxmox node "pve". If a new testing template is needed, replace [vmid], [old_image_name], [image_name] and [size] with corresponding values.  
+Afterwards, shell commands are run on the Proxmox node "pve". If a new testing template is needed, replace [vmid], [old_image_name], [image_name] and [size] with corresponding values.  
 
 To be able to see the VM later through the console in Proxmox and configure it:  
 
@@ -75,13 +119,13 @@ virt-customize –a [image_name] --install qemu-guest-agent
 qm importdisk [vmid] [image_name] local-lvm 
 ```
 
-#### GUI
+### GUI
 
 Now we move from the shell to the GUI, and under the template, the disk that just got imported is added:
 
 ![disk](images/image3.png)
 
-##### Thereafter, these non-default settings are changed
+#### Non-default settings changed
 
 - The scsi0 is enabled and the boot order is changed to this:
 ![bootorder](images/image2.png)
@@ -96,7 +140,7 @@ The template is finalized after right clicking the VM "ubuntu-2204-template1" an
 qm importdisk [vmid] [image_name] local-lvm
 ```
 
-### Terraform
+## Terraform
 
 Terraform is the tool used to provision the VMs inside this testing environment. In order to use it, an endpoint, an API-token and a provider API are needed:
 
@@ -112,7 +156,7 @@ Terraform is the tool used to provision the VMs inside this testing environment.
 
 In order to provision resources on the endpoint, a client with Terraform is needed.
 
-#### Terraform version
+### Terraform version
 
 ```bash
 terraform --version
@@ -120,11 +164,11 @@ Terraform v1.7.4
 on linux_amd64
 ```
 
-#### Terraform configuration
+### Terraform configuration
 
 `terraform apply` uses the "ubuntu-test.tf" file to provision VMs, which contains a loop that goes through a list of variables inside the "vars.tf" file.
 
-##### vars.tf
+#### vars.tf
 
 List
 
@@ -154,7 +198,7 @@ The specifications of our VMs are written in "vars.tf"
     }
 ```
 
-##### ubuntu-test.tf
+#### ubuntu-test.tf
 
 Loop
 
@@ -175,7 +219,7 @@ Example: "each.value.ram" pulls the value "ram" from the list in "vars.tf". The 
 
 [Link to Code](Terraform)
 
-#### Cloud-init
+### Cloud-init
 
 The testing template "ubuntu-2204-template1" uses Cloud-init, which means that the settings which were set applies to every VM created using said template. However, these settings can be overridden if we specify these Cloud-init settings under "initialization" inside the .tf file that is applied through `terraform apply`. For example, the template's standard ip configuration is set to "ip=dhcp", but is overriden by following code:
 
@@ -191,11 +235,11 @@ initialization {
     }
 ```
 
-### Ansible
+## Ansible
 
 In order to configure multiple VMs, a client with Ansible is needed.
 
-#### Ansible version
+### Ansible version
 
 ```bash
 ansible --version
@@ -204,7 +248,7 @@ ansible [core 2.16.4]
   jinja version = 3.0.3
 ```
 
-#### Playbook
+### Playbook
 
 ```bash
 ansible-playbook playbook.yml -i inventory.ini --extra-vars "@passwd.yml" --ask-vault-pass --ssh-common-args='-o StrictHostKeyChecking=no'
@@ -220,19 +264,19 @@ The argument `--extra-vars "@passwd.yml"` pulls variables from "passwd.yml", in 
 
 To be able to access the variables, the argument `--ask-vault-pass` is parsed and asks for the vault password, which unlocks the "passwd.yml" file.
 
-The first playbook that gets run, after the VMs are provisioned by Terraform, needs to have the argument `--ssh-common-args='-o StrictHostKeyChecking=no'` since the fresh VMs have new pairs of SSH-keys which would otherwise have to be manually approved by the client running Ansible. When running a playbook after the initial configuration, the argument can be ommited, since the keys are now stored in the client's "known_hosts" file. If the VMs are destroyed, their keys should be removed from "known_hosts" before being deployed again.
+The first playbook that gets run, after the VMs are provisioned by Terraform, needs to have the argument `--ssh-common-args='-o StrictHostKeyChecking=no'` since the fresh VMs have new pairs of SSH-keys which would otherwise have to be manually approved by the client running Ansible. When running a playbook after the initial configuration, the argument can be ommited, since the keys are now stored in the client's "known_hosts" file. If the VMs are destroyed, their keys should be removed from "known_hosts" before being deployed again as a best practice.
 
 [Link to Code](Ansible)
 
-### Docker
+## Docker
 
 Ansible installs a docker container on the host/s specified in the "inventory.ini" file using "docker compose". The "docker compose" file sets up a PostgreSQL database on port 5432 with pgAdmin on port 8080. The volumes created by the "docker compose" are destroyed when the VM running "docker compose" is destroyed.
 
 [Link to Code](postgres-docker)
 
-### Deployment
+## Deployment
 
-#### Deploying the VMs
+### Deploying the VMs
 
 **NOTE:** Running the playbook immediately after using `terraform apply` can sometimes cause the playbook to fail at upgrading the VMs, since Cloud-init could still be running the intial setup and locking the /var/lib/dpkg/lock file.
 
@@ -268,7 +312,7 @@ The initial configuration (playbook) of the VMs takes around two minutes.
 
 ![ansible-play-recap](images/image6.png)
 
-#### Destroying the VMs
+### Destroying the VMs
 
 ```bash
 cd Terraform/ && terraform apply -destroy -auto-approve
@@ -292,17 +336,17 @@ proxmox_virtual_environment_vm.tango-test["tango-test1"]: Destruction complete a
 Apply complete! Resources: 0 added, 0 changed, 3 destroyed. 
 ```
 
-Before deploying again, remove the hosts SSH-keys from the "./ssh/known_hosts" file.
+Best practice is to remove the hosts SSH-keys from the "./ssh/known_hosts" file before deploying again.
 
-### GitHub
+## GitHub
 
 This environment is split into two branches: "main" and "testing". The main branch is representing a production branch and the testing branch is where changes to the code are initially commited and tested. Before merging the two, the code that is commited to the testing branch should pass all checks on pushing and on pull request to the main branch. If the tests fail, the pull request should be manually closed. If the tests succeed, the pull request needs to be manually approved.
 
-#### Configuration of GitHub Actions
+### Configuration of GitHub Actions
 
 GitHub Actions is a CI/CD tool. There are several workflows in this environment. A workflow tests code on a runner provided by GitHub, also if specified, the runner can spin up a container to test changes made to code. All workflows used in this testing environment can be found on the GitHub Marketplace, except the "docker-compose-test".
 
-#### Workflows
+### Workflows
 
 Every workflow gets triggered when pushing commits to the testing branch or when doing a pull request to main branch. On a pull request to main, all files within the repository get tested.
 
@@ -314,7 +358,7 @@ Every workflow gets triggered when pushing commits to the testing branch or when
 
 - The "docker-compose-test" checks commited changes made to the "docker-compose.yml".
 
-#### Workflow example
+### Workflow example
 
 A workflow gets triggered when changes are made to "postgres-docker/docker-compose.yml" and gets pushed to the branch "testing" or on a pull request to "main".
 
@@ -369,25 +413,3 @@ The checkout pulls the code from this repository, runs docker compose, tests the
       - name: Stop and remove Docker Compose services
         run: docker compose -f postgres-docker/docker-compose.yml down
 ```
-
-Example of workflow failing and giving an error code, making it easier to troubleshoot.
-
-![workflow-fail](images/image7.png)
-
-Example of workflow succeding:
-
-![workflow-success](images/image8.png)
-
-Example of manually closing pull request that doesn't meet requirements:
-
-![pullrequest-failure](images/image9.png)
-
-Example of manually approving pull request that meet requirements:
-
-![pullrequest-success](images/image10.png)
-
-#### Cost
-
-Every commit which is affected by either one of these workflows takes around 30-60 seconds for a runner to test. Every workflow that runs under 60 seconds gets billed as 1 minute. With the GitHub Team subscription the team gets 5000 CI/CD minutes/per month in total.
-
-[Link to Code](.github/workflows)
