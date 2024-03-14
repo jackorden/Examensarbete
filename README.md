@@ -1,5 +1,11 @@
 # Tango AB - Testing environment
 
+## Support
+**Open** 8:00 AM - 5:00 PM, Monday - Friday
+
+**Phone:** 08-530 391 72
+
+**E-mail:** support@synjack.com
 ## Quick guide
 
 ### How to setup the testing environment
